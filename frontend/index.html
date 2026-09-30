@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AccessNow — Accessibility Map</title>
+<style>
+:root{
+  --navy:#132238; --blue:#246BFD; --cyan:#22B8CF; --bg:#F4F7FB;
+  --card:#fff; --muted:#667085; --line:#E4E8EF; --green:#16A36A;
+  --amber:#F59E0B; --red:#E05252; --shadow:0 8px 30px rgba(20,35,56,.08);
+}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--navy)}
+button,input{font:inherit} button{cursor:pointer;border:0}
+.app{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
+.sidebar{background:#fff;border-right:1px solid var(--line);padding:24px 16px;position:sticky;top:0;height:100vh}
+.logo{font-weight:900;font-size:24px;letter-spacing:-1px;padding:6px 12px 28px}.logo span{color:var(--blue)}
+.nav button{width:100%;background:transparent;text-align:left;padding:13px 14px;border-radius:12px;margin:3px 0;color:#526071;font-weight:700}
+.nav button.active,.nav button:hover{background:#EEF4FF;color:var(--blue)}
+.nav small{display:block;color:#98A2B3;font-size:10px;font-weight:800;text-transform:uppercase;padding:22px 14px 5px;letter-spacing:1px}
+.user{position:absolute;bottom:20px;left:16px;right:16px;border-top:1px solid var(--line);padding:16px 10px;display:flex;gap:10px;align-items:center}
+.avatar{width:38px;height:38px;border-radius:50%;background:#DCE7FF;color:#2254C7;display:grid;place-items:center;font-weight:900}
+.main{min-width:0}.top{height:72px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 30px}
+.search{width:min(560px,55vw);background:#F4F6F9;border:1px solid var(--line);border-radius:12px;padding:11px 15px;display:flex;gap:9px}.search input{border:0;outline:0;background:transparent;width:100%}
+.content{padding:28px 30px 45px;max-width:1500px;margin:auto}.view{display:none}.view.active{display:block}
+h1{font-size:30px;margin:0 0 7px;letter-spacing:-.7px}.sub{color:var(--muted);margin-bottom:25px}
+.grid{display:grid;gap:18px}.two{grid-template-columns:1.55fr 1fr}.three{grid-template-columns:repeat(3,1fr)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:20px}
+.map{height:570px;border-radius:16px;overflow:hidden;position:relative;background:
+linear-gradient(25deg,transparent 46%,#d7dee9 47%,#d7dee9 49%,transparent 50%),
+linear-gradient(115deg,transparent 43%,#d7dee9 44%,#d7dee9 46%,transparent 47%),
+linear-gradient(70deg,transparent 62%,#e1e6ee 63%,#e1e6ee 64%,transparent 65%),
+#e9eef5}
+.map:before,.map:after{content:"";position:absolute;background:#fff;opacity:.7}.map:before{width:110%;height:35px;left:-5%;top:48%;transform:rotate(-14deg)}.map:after{width:110%;height:28px;left:-5%;top:30%;transform:rotate(18deg)}
+.map-label{position:absolute;z-index:2;font-size:11px;font-weight:800;color:#718096;background:#fff9;padding:5px 7px;border-radius:6px}
+.pin{position:absolute;z-index:5;width:38px;height:38px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--blue);display:grid;place-items:center;color:#fff;font-weight:900;box-shadow:0 5px 15px #246bfd55}
+.pin span{transform:rotate(45deg)} .pin.good{background:var(--green)} .pin.warn{background:var(--amber)}
+.map-tools{position:absolute;z-index:6;top:14px;left:14px;display:flex;gap:8px}.pill{background:#fff;border:1px solid var(--line);padding:9px 12px;border-radius:10px;font-weight:750;box-shadow:0 3px 12px #00000010}
+.map-card{position:absolute;z-index:7;left:16px;bottom:16px;width:330px;background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:16px}
+.score{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:#E7F7F0;color:var(--green);font-weight:900;font-size:15px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px}.tag{font-size:11px;padding:5px 8px;border-radius:7px;background:#EEF4FF;color:#315FC5;font-weight:800}.verified{color:var(--green);font-size:12px;font-weight:800}
+.btn{background:var(--blue);color:#fff;padding:11px 15px;border-radius:10px;font-weight:800}.btn.secondary{background:#EEF4FF;color:var(--blue)}.btn.ghost{background:#fff;color:var(--navy);border:1px solid var(--line)}
+.place{padding:13px 0;border-bottom:1px solid var(--line);display:flex;gap:12px}.place:last-child{border-bottom:0}.thumb{width:64px;height:64px;border-radius:10px;background:linear-gradient(135deg,#d7e6ff,#eef4ff);display:grid;place-items:center;font-size:24px}
+.rating{font-weight:900}.stars{color:#F6B73C;letter-spacing:1px}.muted{color:var(--muted);font-size:13px}.section-title{font-size:15px;font-weight:900;margin:0 0 14px}
+.progress{height:8px;background:#EDF0F4;border-radius:10px;overflow:hidden}.progress i{display:block;height:100%;background:var(--green);border-radius:10px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}.filter{padding:9px 12px;border:1px solid var(--line);background:#fff;border-radius:20px;font-size:12px;font-weight:750}.filter.on{border-color:#AFC7FF;background:#EEF4FF;color:var(--blue)}
+.modal{position:fixed;inset:0;background:#0b1728aa;display:none;align-items:center;justify-content:center;z-index:20;padding:20px}.modal.open{display:flex}.modal-box{background:#fff;border-radius:18px;width:min(700px,100%);max-height:90vh;overflow:auto;padding:24px}.close{float:right;background:#F1F3F6;border-radius:50%;width:34px;height:34px}
+.field{margin:14px 0}.field label{display:block;font-size:12px;font-weight:850;margin-bottom:7px}.field input,.field textarea,.field select{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px;outline:none}
+.route{display:flex;gap:14px;align-items:center;padding:14px;border:1px solid var(--line);border-radius:12px;margin:10px 0}.route.active{border-color:#9CB9FF;background:#F5F8FF}
+.stat{padding:17px;border:1px solid var(--line);border-radius:13px}.stat b{font-size:26px}.stat span{display:block;color:var(--muted);font-size:12px;margin-top:3px}
+@media(max-width:900px){.app{grid-template-columns:72px 1fr}.sidebar{padding:16px 9px}.logo{font-size:0}.logo:after{content:"A";font-size:24px}.nav button{font-size:0;text-align:center}.nav button:first-letter{font-size:18px}.nav small,.user div:not(.avatar){display:none}.user{left:9px}.content{padding:20px}.two,.three{grid-template-columns:1fr}.search{width:50vw}.top{padding:0 18px}.map{height:480px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="logo">Access<span>Now</span></div>
+  <div class="nav">
+    <small>Explore</small>
+    <button class="active" onclick="showView('home',this)">⌂ &nbsp; Explore map</button>
+    <button onclick="showView('saved',this)">♡ &nbsp; Saved places</button>
+    <button onclick="showView('contribute',this)">＋ &nbsp; Contribute</button>
+    <small>Account</small>
+    <button onclick="showView('profile',this)">◯ &nbsp; My profile</button>
+    <button onclick="showView('settings',this)">⚙ &nbsp; Preferences</button>
+  </div>
+  <div class="user"><div class="avatar">JP</div><div><b>Jordan Peters</b><div class="muted">Contributor · 42 reviews</div></div></div>
+</aside>
+<main class="main">
+<header class="top">
+  <div class="search">⌕ <input id="searchInput" placeholder="Search a venue, address, or “near me”" onkeydown="if(event.key==='Enter') doSearch()"><button class="btn" onclick="doSearch()">Search</button></div>
+  <button class="btn secondary" onclick="showView('contribute',document.querySelectorAll('.nav button')[2])">＋ Add place</button>
+</header>
+<div class="content">
+
+<section id="home" class="view active">
+  <h1>Find places that work for you.</h1><div class="sub">Crowd-verified accessibility information, before you arrive.</div>
+  <div class="filters">
+    <button class="filter on" onclick="toggleFilter(this)">♿ Wheelchair</button><button class="filter" onclick="toggleFilter(this)">◉ Visual</button><button class="filter" onclick="toggleFilter(this)">◌ Hearing</button><button class="filter" onclick="toggleFilter(this)">✦ Sensory</button><button class="filter" onclick="toggleFilter(this)">No stairs</button>
+  </div>
+  <div class="grid two">
+    <div class="map">
+      <div class="map-tools"><button class="pill" onclick="alert('Map centered on your selected area.')">◎ Near me</button><button class="pill" onclick="alert('Showing accessibility-friendly routes.')">⇢ Accessible routes</button></div>
+      <div class="map-label" style="left:18%;top:22%">Independence Square</div><div class="map-label" style="left:63%;top:15%">Woodbrook</div><div class="map-label" style="left:42%;top:68%">Downtown</div>
+      <div class="map-card"><div class="row"><div><b>AccessNow map</b><div class="muted">Select a venue pin to inspect accessibility.</div></div><div class="score">AI</div></div></div></div><div class="card">
+      <div class="row"><h3 class="section-title">Nearby places</h3><span class="muted">Updated live</span></div>
+      <div class="place" onclick="openVenue('Harbour Lights Café')"><div class="thumb">☕</div><div style="flex:1"><div class="row"><b>Harbour Lights Café</b><span class="rating">94</span></div><div class="stars">★★★★★</div><div class="muted">0.4 mi · 23 reviews</div><div><span class="tag">Step-free</span> <span class="tag">WC</span></div></div></div>
+      <div class="place" onclick="openVenue('The Green Room')"><div class="thumb">🍽️</div><div style="flex:1"><div class="row"><b>The Green Room</b><span class="rating">88</span></div><div class="stars">★★★★☆</div><div class="muted">0.7 mi · 17 reviews</div><div><span class="tag">Ramp</span> <span class="tag">Wide doors</span></div></div></div>
+      <div class="place" onclick="openVenue('Queen’s Park Medical')"><div class="thumb">🏥</div><div style="flex:1"><div class="row"><b>Queen’s Park Medical</b><span class="rating">97</span></div><div class="stars">★★★★★</div><div class="muted">1.1 mi · 31 reviews</div><div><span class="tag">Lift</span> <span class="tag">WC</span></div></div></div>
+      <div class="place" onclick="openVenue('Central Market')"><div class="thumb">🛍️</div><div style="flex:1"><div class="row"><b>Central Market</b><span class="rating">62</span></div><div class="stars">★★★☆☆</div><div class="muted">1.3 mi · 9 reviews</div><div><span class="tag" style="background:#FFF5DD;color:#9A6500">Step at entrance</span></div></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="saved" class="view"><h1>Saved places</h1><div class="sub">Places you want to remember.</div><div class="grid three">
+  <div class="card"><div class="thumb" style="width:100%;height:150px">☕</div><h3>Harbour Lights Café</h3><div class="verified">✓ Verified 2 days ago</div><p class="muted">94 accessibility score · Step-free entrance</p><button class="btn" onclick="openVenue('Harbour Lights Café')">View place</button></div>
+  <div class="card"><div class="thumb" style="width:100%;height:150px">🎬</div><h3>MovieHouse One</h3><div class="verified">✓ Verified 1 week ago</div><p class="muted">91 accessibility score · Accessible seating</p><button class="btn" onclick="openVenue('MovieHouse One')">View place</button></div>
+  <div class="card"><div class="thumb" style="width:100%;height:150px">🌳</div><h3>Queen's Park Savannah</h3><div class="verified">✓ Verified today</div><p class="muted">86 accessibility score · Accessible paths</p><button class="btn" onclick="openVenue('Queen’s Park Medical')">View nearby</button></div>
+</div></section>
+
+<section id="contribute" class="view"><h1>Make the map smarter.</h1><div class="sub">Your firsthand experience helps someone else plan with confidence.</div>
+<div class="grid two"><div class="card"><h3>Submit an accessibility check</h3>
+<div class="field"><label>PLACE</label><input id="placeName" placeholder="e.g. Harbour Lights Café"></div>
+<div class="field"><label>WHAT DID YOU CHECK?</label><select><option>Entrance & pathway</option><option>Restroom</option><option>Seating</option><option>Parking</option><option>Sensory environment</option></select></div>
+<div class="field"><label>YOUR RATING</label><div class="filters"><button class="filter on">1</button><button class="filter">2</button><button class="filter">3</button><button class="filter">4</button><button class="filter">5</button></div></div>
+<div class="field"><label>NOTES</label><textarea rows="4" placeholder="What should another visitor know?"></textarea></div>
+<button class="btn" onclick="submitReview()">Submit review</button></div>
+<div class="card"><h3>Contributor impact</h3><div class="grid three"><div class="stat"><b>42</b><span>Reviews</span></div><div class="stat"><b>18</b><span>Photos</span></div><div class="stat"><b>7</b><span>Updates</span></div></div><hr style="border:0;border-top:1px solid var(--line);margin:22px 0"><p><b>Community Contributor</b></p><div class="progress"><i style="width:72%"></i></div><p class="muted">8 more verified updates to reach Local Guide.</p><div class="tag">🏅 Reliable Reporter</div></div></div></section>
+
+<section id="profile" class="view"><h1>Jordan Peters</h1><div class="sub">Your AccessNow profile and contribution history.</div>
+<div class="grid two"><div class="card"><div class="row"><div class="avatar" style="width:64px;height:64px;font-size:20px">JP</div><div style="flex:1"><h2 style="margin:0">Jordan Peters</h2><div class="muted">Community Contributor</div></div><button class="btn secondary">Edit profile</button></div><hr style="border:0;border-top:1px solid var(--line);margin:20px 0"><h3>Accessibility preferences</h3><div class="filters"><span class="filter on">♿ Wheelchair</span><span class="filter">No stairs</span><span class="filter">Accessible WC</span></div></div>
+<div class="card"><h3>Contribution activity</h3><div class="stat"><b>42</b><span>Total reviews submitted</span></div><div style="margin-top:14px"><b>Latest activity</b><p class="muted">Updated Central Market entrance · 2 hours ago</p><p class="muted">Added photo to Harbour Lights Café · yesterday</p><p class="muted">Reviewed MovieHouse One · 5 days ago</p></div></div></div></section>
+
+<section id="settings" class="view"><h1>Preferences</h1><div class="sub">Personalize how AccessNow finds and routes places for you.</div><div class="card" style="max-width:760px"><h3>Navigation preferences</h3><div class="place"><div style="flex:1"><b>Avoid stairs</b><div class="muted">Always route around stairs when possible.</div></div><button class="filter on" onclick="this.classList.toggle('on')">On</button></div><div class="place"><div style="flex:1"><b>Avoid steep grades</b><div class="muted">Prefer flatter routes even when they take longer.</div></div><button class="filter on" onclick="this.classList.toggle('on')">On</button></div><div class="place"><div style="flex:1"><b>Venue-change alerts</b><div class="muted">Notify me when accessibility information changes.</div></div><button class="filter" onclick="this.classList.toggle('on')">Off</button></div><h3 style="margin-top:25px">Default filters</h3><div class="filters"><button class="filter on">♿ Wheelchair</button><button class="filter">Visual</button><button class="filter">Hearing</button><button class="filter">Sensory</button></div></div></section>
+</div></main></div>
+
+<div class="modal" id="venueModal"><div class="modal-box"><button class="close" onclick="closeModal()">×</button><div id="venueContent"></div></div></div>
+<script>
+const API_BASE = "/api";
+let apiVenues = [];
+let selectedVenue = null;
+
+async function api(path, options={}) {
+  const response = await fetch(API_BASE + path, {
+    headers: {"Content-Type":"application/json", ...(options.headers || {})},
+    ...options
+  });
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    throw new Error(body.detail || `Request failed (${response.status})`);
+  }
+  return response.status === 204 ? null : response.json();
+}
+
+async function loadHome() {
+  try {
+    apiVenues = await api("/venues");
+    renderNearby(apiVenues);
+    renderMapPins(apiVenues);
+  } catch (error) {
+    console.error(error);
+    alert("The AccessNow API could not be reached. Start the FastAPI server and refresh.");
+  }
+}
+
+function renderNearby(venues) {
+  const cards = document.querySelectorAll("#home .card");
+  const panel = cards[1];
+  if (!panel) return;
+  panel.innerHTML = `
+    <div class="row"><h3 class="section-title">Nearby places</h3><span class="muted">${venues.length} demo venues</span></div>
+    ${venues.map(v => `
+      <div class="place" onclick="openVenueById(${v.id})">
+        <div class="thumb">${v.icon || "📍"}</div>
+        <div style="flex:1">
+          <div class="row"><b>${escapeHtml(v.name)}</b><span class="rating">${v.score}</span></div>
+          <div class="stars">${"★".repeat(Math.round(v.score/20))}${"☆".repeat(5-Math.round(v.score/20))}</div>
+          <div class="muted">${escapeHtml(v.address)} · ${v.review_count} reviews</div>
+          <div>${(v.tags || []).slice(0,2).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join(" ")}</div>
+        </div>
+      </div>`).join("")}`;
+}
+
+function renderMapPins(venues) {
+  const map = document.querySelector(".map");
+  if (!map) return;
+  map.querySelectorAll(".api-pin").forEach(p => p.remove());
+  venues.forEach(v => {
+    const pin = document.createElement("div");
+    pin.className = "pin api-pin " + (v.score >= 90 ? "good" : v.score < 70 ? "warn" : "");
+    pin.style.left = `${v.map_x}%`;
+    pin.style.top = `${v.map_y}%`;
+    pin.innerHTML = `<span>${v.score < 70 ? "!" : "♿"}</span>`;
+    pin.title = v.name;
+    pin.onclick = () => openVenueById(v.id);
+    map.appendChild(pin);
+  });
+}
+
+async function openVenueById(id) {
+  try {
+    const v = await api(`/venues/${id}`);
+    selectedVenue = v;
+    document.getElementById("venueContent").innerHTML = `
+      <div class="row"><div><div class="muted">${escapeHtml(v.type)}</div>
+      <h1 style="margin:3px 0">${escapeHtml(v.name)}</h1>
+      <div class="muted">${escapeHtml(v.address)}</div></div>
+      <div class="score" style="width:72px;height:72px;font-size:21px">${v.score}</div></div>
+      <div style="margin:20px 0"><span class="verified">✓ Verified ${escapeHtml(v.verified)}</span> · <span class="muted">${v.review_count} community reviews</span></div>
+      <div class="filters">${(v.tags || []).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join(" ")}</div>
+      <h3>Accessibility breakdown</h3>
+      ${(v.accessibility || []).map(x => `
+        <div style="margin:16px 0"><div class="row"><b>${escapeHtml(x.category)}</b>
+        <span class="muted">${escapeHtml(x.description)}</span><b>${x.percent}%</b></div>
+        <div class="progress"><i style="width:${x.percent}%"></i></div></div>`).join("")}
+      ${v.latest_review ? `<div class="card" style="background:#F8FAFC;box-shadow:none;margin-top:20px">
+        <div class="stars">★★★★★</div><p style="margin:8px 0">“${escapeHtml(v.latest_review.body)}”</p>
+        <b>${escapeHtml(v.latest_review.author)}</b><div class="muted">Community contributor</div></div>` : ""}
+      <div style="display:flex;gap:10px;margin-top:18px">
+        <button class="btn" onclick="showRoute(${v.id})">Get accessible route</button>
+        <button class="btn secondary" onclick="alert('Photo upload opened for this venue.')">Add photo</button>
+        <button class="btn ghost" onclick="saveVenue(${v.id})">♡ Save</button>
+      </div>`;
+    document.getElementById("venueModal").classList.add("open");
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+async function saveVenue(id) {
+  try {
+    await api("/saved", {method:"POST", body:JSON.stringify({user_id:1, venue_id:id})});
+    alert("Saved to your AccessNow places.");
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+async function showRoute(id) {
+  try {
+    const route = await api(`/venues/${id}/route`);
+    closeModal();
+    document.getElementById("venueModal").classList.add("open");
+    document.getElementById("venueContent").innerHTML = `
+      <div class="muted">ACCESSIBLE NAVIGATION</div>
+      <h1>Route to ${escapeHtml(route.venue_name)}</h1>
+      <div class="sub">Routes are tailored to your wheelchair + no-stairs preferences.</div>
+      <div class="route active"><div class="score">A</div><div style="flex:1"><b>Accessible route</b>
+      <div class="muted">${route.minutes} min · ${route.miles} mi · no stairs · smooth paths</div></div><b>Recommended</b></div>
+      <div class="route"><div class="score" style="background:#FFF5DD;color:#A86C00">B</div><div style="flex:1"><b>Alternative</b>
+      <div class="muted">${route.alternative_minutes} min · ${route.alternative_miles} mi · one steep section</div></div></div>
+      <div class="card" style="margin-top:18px"><b>Route alerts</b><p class="muted">${escapeHtml(route.alert)}</p></div>
+      <button class="btn" onclick="closeModal()">Start navigation</button>`;
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+function showView(id,btn) {
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
+  if(btn) btn.classList.add("active");
+  if(id === "saved") loadSaved();
+  if(id === "profile") loadProfile();
+}
+
+function toggleFilter(b){b.classList.toggle("on");}
+
+async function doSearch() {
+  const q = document.getElementById("searchInput").value.trim();
+  if (!q) return;
+  try {
+    const results = await api(`/venues?search=${encodeURIComponent(q)}`);
+    if (results.length === 1) return openVenueById(results[0].id);
+    if (results.length) {
+      renderNearby(results);
+      document.querySelector("#home").classList.add("active");
+      alert(`${results.length} AccessNow demo places match "${q}".`);
+    } else {
+      alert(`No demo venue found for "${q}". Try Harbour Lights Café, The Green Room, Queen’s Park Medical, or Central Market.`);
+    }
+  } catch (error) { alert(error.message); }
+}
+
+async function submitReview() {
+  const name = document.getElementById("placeName").value.trim();
+  if (!name) return alert("Enter a place name first.");
+  const venue = apiVenues.find(v => v.name.toLowerCase().includes(name.toLowerCase()));
+  if (!venue) return alert("For this demo, submit a review for one of the existing venues.");
+  try {
+    await api(`/venues/${venue.id}/reviews`, {
+      method:"POST",
+      body:JSON.stringify({
+        user_id:1, rating:5,
+        category:"Entrance & pathway",
+        body:"Demo community update submitted from the AccessNow prototype."
+      })
+    });
+    alert("Thanks! Your review was saved to the database and added to the moderation queue.");
+    await loadHome();
+    showView("home", document.querySelector(".nav button"));
+  } catch (error) { alert(error.message); }
+}
+
+async function loadSaved() {
+  try {
+    const saved = await api("/users/1/saved");
+    const section = document.getElementById("saved");
+    section.querySelector(".grid").innerHTML = saved.map(v => `
+      <div class="card"><div class="thumb" style="width:100%;height:150px">${v.icon || "📍"}</div>
+      <h3>${escapeHtml(v.name)}</h3><div class="verified">✓ Verified ${escapeHtml(v.verified)}</div>
+      <p class="muted">${v.score} accessibility score · ${escapeHtml(v.address)}</p>
+      <button class="btn" onclick="openVenueById(${v.id})">View place</button></div>`).join("") ||
+      `<div class="card"><h3>No saved places yet</h3><p class="muted">Save a venue from its accessibility details.</p></div>`;
+  } catch (error) { console.error(error); }
+}
+
+async function loadProfile() {
+  try {
+    const p = await api("/users/1");
+    document.querySelector("#profile h1").textContent = p.name;
+    document.querySelector("#profile .sub").textContent = `${p.role} · ${p.review_count} reviews`;
+  } catch (error) { console.error(error); }
+}
+
+function closeModal(){document.getElementById("venueModal").classList.remove("open");}
+function escapeHtml(value){return String(value ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));}
+
+document.getElementById("venueModal").addEventListener("click",e=>{if(e.target.id==="venueModal")closeModal();});
+document.addEventListener("DOMContentLoaded", loadHome);
+</script>
+</body></html>
