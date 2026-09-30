@@ -2,116 +2,694 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AccessNow — Accessibility Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{
-  --navy:#132238; --blue:#246BFD; --cyan:#22B8CF; --bg:#F4F7FB;
-  --card:#fff; --muted:#667085; --line:#E4E8EF; --green:#16A36A;
-  --amber:#F59E0B; --red:#E05252; --shadow:0 8px 30px rgba(20,35,56,.08);
+:root {
+  --navy-900: #0f172a;
+  --navy-800: #1e293b;
+  --slate-600: #475569;
+  --slate-500: #64748b;
+  --slate-400: #94a3b8;
+  --slate-200: #e2e8f0;
+  --slate-100: #f1f5f9;
+  --slate-50: #f8fafc;
+  
+  --blue-600: #2563eb;
+  --blue-700: #1d4ed8;
+  --blue-50: #eff6ff;
+  --blue-100: #dbeafe;
+
+  --emerald-600: #059669;
+  --emerald-50: #ecfdf5;
+  --amber-600: #d97706;
+  --amber-50: #fffbeb;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.06), 0 2px 4px -2px rgb(0 0 0 / 0.06);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.06), 0 4px 6px -4px rgb(0 0 0 / 0.06);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.04);
 }
-*{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--navy)}
-button,input{font:inherit} button{cursor:pointer;border:0}
-.app{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
-.sidebar{background:#fff;border-right:1px solid var(--line);padding:24px 16px;position:sticky;top:0;height:100vh}
-.logo{font-weight:900;font-size:24px;letter-spacing:-1px;padding:6px 12px 28px}.logo span{color:var(--blue)}
-.nav button{width:100%;background:transparent;text-align:left;padding:13px 14px;border-radius:12px;margin:3px 0;color:#526071;font-weight:700}
-.nav button.active,.nav button:hover{background:#EEF4FF;color:var(--blue)}
-.nav small{display:block;color:#98A2B3;font-size:10px;font-weight:800;text-transform:uppercase;padding:22px 14px 5px;letter-spacing:1px}
-.user{position:absolute;bottom:20px;left:16px;right:16px;border-top:1px solid var(--line);padding:16px 10px;display:flex;gap:10px;align-items:center}
-.avatar{width:38px;height:38px;border-radius:50%;background:#DCE7FF;color:#2254C7;display:grid;place-items:center;font-weight:900}
-.main{min-width:0}.top{height:72px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 30px}
-.search{width:min(560px,55vw);background:#F4F6F9;border:1px solid var(--line);border-radius:12px;padding:11px 15px;display:flex;gap:9px}.search input{border:0;outline:0;background:transparent;width:100%}
-.content{padding:28px 30px 45px;max-width:1500px;margin:auto}.view{display:none}.view.active{display:block}
-h1{font-size:30px;margin:0 0 7px;letter-spacing:-.7px}.sub{color:var(--muted);margin-bottom:25px}
-.grid{display:grid;gap:18px}.two{grid-template-columns:1.55fr 1fr}.three{grid-template-columns:repeat(3,1fr)}
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:20px}
-.map{height:570px;border-radius:16px;overflow:hidden;position:relative;background:
-linear-gradient(25deg,transparent 46%,#d7dee9 47%,#d7dee9 49%,transparent 50%),
-linear-gradient(115deg,transparent 43%,#d7dee9 44%,#d7dee9 46%,transparent 47%),
-linear-gradient(70deg,transparent 62%,#e1e6ee 63%,#e1e6ee 64%,transparent 65%),
-#e9eef5}
-.map:before,.map:after{content:"";position:absolute;background:#fff;opacity:.7}.map:before{width:110%;height:35px;left:-5%;top:48%;transform:rotate(-14deg)}.map:after{width:110%;height:28px;left:-5%;top:30%;transform:rotate(18deg)}
-.map-label{position:absolute;z-index:2;font-size:11px;font-weight:800;color:#718096;background:#fff9;padding:5px 7px;border-radius:6px}
-.pin{position:absolute;z-index:5;width:38px;height:38px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--blue);display:grid;place-items:center;color:#fff;font-weight:900;box-shadow:0 5px 15px #246bfd55}
-.pin span{transform:rotate(45deg)} .pin.good{background:var(--green)} .pin.warn{background:var(--amber)}
-.map-tools{position:absolute;z-index:6;top:14px;left:14px;display:flex;gap:8px}.pill{background:#fff;border:1px solid var(--line);padding:9px 12px;border-radius:10px;font-weight:750;box-shadow:0 3px 12px #00000010}
-.map-card{position:absolute;z-index:7;left:16px;bottom:16px;width:330px;background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:16px}
-.score{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:#E7F7F0;color:var(--green);font-weight:900;font-size:15px}
-.row{display:flex;align-items:center;justify-content:space-between;gap:12px}.tag{font-size:11px;padding:5px 8px;border-radius:7px;background:#EEF4FF;color:#315FC5;font-weight:800}.verified{color:var(--green);font-size:12px;font-weight:800}
-.btn{background:var(--blue);color:#fff;padding:11px 15px;border-radius:10px;font-weight:800}.btn.secondary{background:#EEF4FF;color:var(--blue)}.btn.ghost{background:#fff;color:var(--navy);border:1px solid var(--line)}
-.place{padding:13px 0;border-bottom:1px solid var(--line);display:flex;gap:12px}.place:last-child{border-bottom:0}.thumb{width:64px;height:64px;border-radius:10px;background:linear-gradient(135deg,#d7e6ff,#eef4ff);display:grid;place-items:center;font-size:24px}
-.rating{font-weight:900}.stars{color:#F6B73C;letter-spacing:1px}.muted{color:var(--muted);font-size:13px}.section-title{font-size:15px;font-weight:900;margin:0 0 14px}
-.progress{height:8px;background:#EDF0F4;border-radius:10px;overflow:hidden}.progress i{display:block;height:100%;background:var(--green);border-radius:10px}
-.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}.filter{padding:9px 12px;border:1px solid var(--line);background:#fff;border-radius:20px;font-size:12px;font-weight:750}.filter.on{border-color:#AFC7FF;background:#EEF4FF;color:var(--blue)}
-.modal{position:fixed;inset:0;background:#0b1728aa;display:none;align-items:center;justify-content:center;z-index:20;padding:20px}.modal.open{display:flex}.modal-box{background:#fff;border-radius:18px;width:min(700px,100%);max-height:90vh;overflow:auto;padding:24px}.close{float:right;background:#F1F3F6;border-radius:50%;width:34px;height:34px}
-.field{margin:14px 0}.field label{display:block;font-size:12px;font-weight:850;margin-bottom:7px}.field input,.field textarea,.field select{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px;outline:none}
-.route{display:flex;gap:14px;align-items:center;padding:14px;border:1px solid var(--line);border-radius:12px;margin:10px 0}.route.active{border-color:#9CB9FF;background:#F5F8FF}
-.stat{padding:17px;border:1px solid var(--line);border-radius:13px}.stat b{font-size:26px}.stat span{display:block;color:var(--muted);font-size:12px;margin-top:3px}
-@media(max-width:900px){.app{grid-template-columns:72px 1fr}.sidebar{padding:16px 9px}.logo{font-size:0}.logo:after{content:"A";font-size:24px}.nav button{font-size:0;text-align:center}.nav button:first-letter{font-size:18px}.nav small,.user div:not(.avatar){display:none}.user{left:9px}.content{padding:20px}.two,.three{grid-template-columns:1fr}.search{width:50vw}.top{padding:0 18px}.map{height:480px}}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  background: #f3f5f9;
+  color: var(--navy-900);
+  -webkit-font-smoothing: antialiased;
+}
+
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; border: 0; background: none; }
+
+.app {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  background: #ffffff;
+  border-right: 1px solid var(--slate-200);
+  padding: 24px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+}
+
+.logo {
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: -0.5px;
+  margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.logo-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--blue-600);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  display: grid;
+  place-items: center;
+  font-size: 16px;
+  font-weight: 800;
+}
+.logo span { color: var(--blue-600); }
+
+.nav { flex: 1; }
+.nav small {
+  display: block;
+  color: var(--slate-400);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin: 24px 0 8px 12px;
+}
+.nav small:first-child { margin-top: 0; }
+.nav button {
+  width: 100%;
+  text-align: left;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  margin: 2px 0;
+  color: var(--slate-600);
+  font-weight: 600;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.15s ease;
+}
+.nav button:hover {
+  background: var(--slate-100);
+  color: var(--navy-900);
+}
+.nav button.active {
+  background: var(--blue-50);
+  color: var(--blue-600);
+}
+
+.user {
+  margin-top: auto;
+  border-top: 1px solid var(--slate-200);
+  padding-top: 16px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--blue-100);
+  color: var(--blue-700);
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+/* Main Content */
+.main { min-width: 0; display: flex; flex-direction: column; }
+.top {
+  height: 72px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--slate-200);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 36px;
+  position: sticky;
+  top: 0;
+  z-index: 9;
+}
+
+.search {
+  width: min(520px, 50vw);
+  background: var(--slate-100);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  padding: 6px 6px 6px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.2s ease;
+}
+.search:focus-within {
+  background: #fff;
+  border-color: var(--blue-600);
+  box-shadow: 0 0 0 3px var(--blue-50);
+}
+.search input {
+  border: 0;
+  outline: 0;
+  background: transparent;
+  width: 100%;
+  font-size: 14px;
+  color: var(--navy-900);
+}
+
+.content {
+  padding: 36px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+.view { display: none; }
+.view.active { display: block; }
+
+h1 { font-size: 28px; font-weight: 800; margin: 0 0 6px; letter-spacing: -0.5px; }
+.sub { color: var(--slate-500); margin-bottom: 24px; font-size: 15px; }
+
+.grid { display: grid; gap: 24px; }
+.two { grid-template-columns: 1.6fr 1fr; }
+.three { grid-template-columns: repeat(3, 1fr); }
+
+.card {
+  background: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  padding: 24px;
+}
+
+/* Map Components */
+.map {
+  height: 600px;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  position: relative;
+  background: 
+    linear-gradient(25deg, transparent 46%, #dcdfe6 47%, #dcdfe6 49%, transparent 50%),
+    linear-gradient(115deg, transparent 43%, #dcdfe6 44%, #dcdfe6 46%, transparent 47%),
+    linear-gradient(70deg, transparent 62%, #e5e8f0 63%, #e5e8f0 64%, transparent 65%),
+    #eef2f7;
+  border: 1px solid var(--slate-200);
+  box-shadow: var(--shadow-sm);
+}
+.map:before, .map:after { content: ""; position: absolute; background: #fff; opacity: 0.8; }
+.map:before { width: 110%; height: 32px; left: -5%; top: 48%; transform: rotate(-14deg); }
+.map:after { width: 110%; height: 24px; left: -5%; top: 30%; transform: rotate(18deg); }
+
+.map-label {
+  position: absolute;
+  z-index: 2;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--slate-500);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(4px);
+  padding: 4px 8px;
+  border-radius: 6px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.pin {
+  position: absolute;
+  z-index: 5;
+  width: 36px;
+  height: 36px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  background: var(--blue-600);
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-weight: 800;
+  box-shadow: 0 8px 16px rgba(37, 99, 235, 0.3);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.pin:hover { transform: rotate(-45deg) scale(1.15); }
+.pin span { transform: rotate(45deg); font-size: 14px; }
+.pin.good { background: var(--emerald-600); box-shadow: 0 8px 16px rgba(5, 150, 105, 0.3); }
+.pin.warn { background: var(--amber-600); box-shadow: 0 8px 16px rgba(217, 119, 6, 0.3); }
+
+.map-tools { position: absolute; z-index: 6; top: 16px; left: 16px; display: flex; gap: 8px; }
+.pill {
+  background: #ffffff;
+  border: 1px solid var(--slate-200);
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 13px;
+  box-shadow: var(--shadow-md);
+  transition: background 0.15s ease;
+}
+.pill:hover { background: var(--slate-50); }
+
+.map-card {
+  position: absolute;
+  z-index: 7;
+  left: 16px;
+  bottom: 16px;
+  width: 320px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.score {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--emerald-50);
+  color: var(--emerald-600);
+  font-weight: 800;
+  font-size: 15px;
+  flex-shrink: 0;
+  border: 1px solid rgba(5, 150, 105, 0.15);
+}
+
+/* Utilities */
+.row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.tag {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: var(--slate-100);
+  color: var(--slate-600);
+  font-weight: 600;
+}
+.verified { color: var(--emerald-600); font-size: 13px; font-weight: 700; }
+
+.btn {
+  background: var(--blue-600);
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.btn:hover { background: var(--blue-700); }
+.btn.secondary { background: var(--blue-50); color: var(--blue-600); }
+.btn.secondary:hover { background: var(--blue-100); }
+.btn.ghost { background: transparent; color: var(--slate-600); border: 1px solid var(--slate-200); }
+.btn.ghost:hover { background: var(--slate-100); }
+
+.place {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--slate-100);
+  display: flex;
+  gap: 16px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.place:last-child { border-bottom: 0; }
+.thumb {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  background: var(--slate-100);
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.rating { font-weight: 800; font-size: 15px; }
+.stars { color: #f59e0b; letter-spacing: 2px; font-size: 13px; margin: 2px 0; }
+.muted { color: var(--slate-500); font-size: 13px; }
+.section-title { font-size: 16px; font-weight: 700; margin: 0; }
+
+.progress { height: 8px; background: var(--slate-100); border-radius: 20px; overflow: hidden; }
+.progress i { display: block; height: 100%; background: var(--emerald-600); border-radius: 20px; }
+
+.filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+.filter {
+  padding: 8px 14px;
+  border: 1px solid var(--slate-200);
+  background: #fff;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--slate-600);
+  transition: all 0.15s ease;
+}
+.filter:hover { background: var(--slate-50); }
+.filter.on { border-color: var(--blue-600); background: var(--blue-50); color: var(--blue-600); }
+
+/* Modal */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  padding: 20px;
+}
+.modal.open { display: flex; }
+.modal-box {
+  background: #fff;
+  border-radius: var(--radius-xl);
+  width: min(640px, 100%);
+  max-height: 90vh;
+  overflow: auto;
+  padding: 32px;
+  box-shadow: var(--shadow-xl);
+  position: relative;
+}
+.close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: var(--slate-100);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  color: var(--slate-500);
+}
+.close:hover { background: var(--slate-200); }
+
+/* Form Fields */
+.field { margin: 18px 0; }
+.field label { display: block; font-size: 12px; font-weight: 700; color: var(--slate-600); margin-bottom: 6px; letter-spacing: 0.3px; }
+.field input, .field textarea, .field select {
+  width: 100%;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  outline: none;
+  background: var(--slate-50);
+  transition: all 0.15s ease;
+}
+.field input:focus, .field textarea:focus, .field select:focus {
+  background: #fff;
+  border-color: var(--blue-600);
+  box-shadow: 0 0 0 3px var(--blue-50);
+}
+
+.route {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  margin: 12px 0;
+  background: #fff;
+}
+.route.active { border-color: var(--blue-600); background: var(--blue-50); }
+
+.stat { padding: 16px; border: 1px solid var(--slate-200); border-radius: var(--radius-md); background: var(--slate-50); }
+.stat b { font-size: 24px; font-weight: 800; color: var(--navy-900); }
+.stat span { display: block; color: var(--slate-500); font-size: 12px; font-weight: 600; margin-top: 2px; }
+
+@media(max-width: 900px) {
+  .app { grid-template-columns: 80px 1fr; }
+  .sidebar { padding: 16px; }
+  .logo { font-size: 0; margin-bottom: 24px; }
+  .logo-icon { margin: 0 auto; }
+  .nav button { justify-content: center; padding: 12px; }
+  .nav button span { display: none; }
+  .nav small, .user div:not(.avatar) { display: none; }
+  .user { justify-content: center; }
+  .content { padding: 20px; }
+  .two, .three { grid-template-columns: 1fr; }
+  .search { width: 60vw; }
+  .top { padding: 0 20px; }
+  .map { height: 400px; }
+}
 </style>
 </head>
 <body>
 <div class="app">
 <aside class="sidebar">
-  <div class="logo">Access<span>Now</span></div>
+  <div class="logo">
+    <div class="logo-icon">A</div>
+    <span>AccessNow</span>
+  </div>
   <div class="nav">
     <small>Explore</small>
-    <button class="active" onclick="showView('home',this)">⌂ &nbsp; Explore map</button>
-    <button onclick="showView('saved',this)">♡ &nbsp; Saved places</button>
-    <button onclick="showView('contribute',this)">＋ &nbsp; Contribute</button>
+    <button class="active" onclick="showView('home',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+      <span>Explore map</span>
+    </button>
+    <button onclick="showView('saved',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+      <span>Saved places</span>
+    </button>
+    <button onclick="showView('contribute',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
+      <span>Contribute</span>
+    </button>
     <small>Account</small>
-    <button onclick="showView('profile',this)">◯ &nbsp; My profile</button>
-    <button onclick="showView('settings',this)">⚙ &nbsp; Preferences</button>
+    <button onclick="showView('profile',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
+      <span>My profile</span>
+    </button>
+    <button onclick="showView('settings',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+      <span>Preferences</span>
+    </button>
   </div>
-  <div class="user"><div class="avatar">JP</div><div><b>Jordan Peters</b><div class="muted" id="sidebarMeta">Contributor · 42 reviews</div></div></div>
+  <div class="user">
+    <div class="avatar">JP</div>
+    <div>
+      <div style="font-weight: 700; font-size: 14px;">Jordan Peters</div>
+      <div class="muted" id="sidebarMeta">Contributor · 42 reviews</div>
+    </div>
+  </div>
 </aside>
+
 <main class="main">
 <header class="top">
-  <div class="search">⌕ <input id="searchInput" placeholder="Search a venue, address, or “near me”" onkeydown="if(event.key==='Enter') doSearch()"><button class="btn" onclick="doSearch()">Search</button></div>
+  <div class="search">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+    <input id="searchInput" placeholder="Search a venue, address, or “near me”" onkeydown="if(event.key==='Enter') doSearch()">
+    <button class="btn" style="padding: 6px 14px; font-size: 13px;" onclick="doSearch()">Search</button>
+  </div>
   <button class="btn secondary" onclick="showView('contribute',document.querySelectorAll('.nav button')[2])">＋ Add place</button>
 </header>
+
 <div class="content">
 
 <section id="home" class="view active">
-  <h1>Find places that work for you.</h1><div class="sub">Crowd-verified accessibility information, before you arrive.</div>
+  <h1>Find places that work for you</h1>
+  <div class="sub">Crowd-verified accessibility information, before you arrive.</div>
   <div class="filters">
-    <button class="filter on" onclick="toggleFilter(this)">♿ Wheelchair</button><button class="filter" onclick="toggleFilter(this)">◉ Visual</button><button class="filter" onclick="toggleFilter(this)">◌ Hearing</button><button class="filter" onclick="toggleFilter(this)">✦ Sensory</button><button class="filter" onclick="toggleFilter(this)">No stairs</button>
+    <button class="filter on" onclick="toggleFilter(this)">♿ Wheelchair</button>
+    <button class="filter" onclick="toggleFilter(this)">◉ Visual</button>
+    <button class="filter" onclick="toggleFilter(this)">◌ Hearing</button>
+    <button class="filter" onclick="toggleFilter(this)">✦ Sensory</button>
+    <button class="filter" onclick="toggleFilter(this)">No stairs</button>
   </div>
   <div class="grid two">
     <div class="map">
-      <div class="map-tools"><button class="pill" onclick="alert('Map centered on your selected area.')">◎ Near me</button><button class="pill" onclick="alert('Showing accessibility-friendly routes.')">⇢ Accessible routes</button></div>
-      <div class="map-label" style="left:18%;top:22%">Independence Square</div><div class="map-label" style="left:63%;top:15%">Woodbrook</div><div class="map-label" style="left:42%;top:68%">Downtown</div>
-      <div class="map-card" id="mapCard"><div class="row"><div><b>AccessNow map</b><div class="muted">Select a venue pin to inspect accessibility.</div></div></div></div>
+      <div class="map-tools">
+        <button class="pill" onclick="alert('Map centered on your selected area.')">◎ Near me</button>
+        <button class="pill" onclick="alert('Showing accessibility-friendly routes.')">⇢ Accessible routes</button>
+      </div>
+      <div class="map-label" style="left:18%;top:22%">Independence Square</div>
+      <div class="map-label" style="left:63%;top:15%">Woodbrook</div>
+      <div class="map-label" style="left:42%;top:68%">Downtown</div>
+      <div class="map-card" id="mapCard">
+        <div class="row">
+          <div>
+            <div style="font-weight: 700;">AccessNow map</div>
+            <div class="muted">Select a venue pin to inspect accessibility.</div>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="card">
-      <div class="row"><h3 class="section-title">Nearby places</h3><span class="muted" id="nearbyCount">Updated live</span></div>
+      <div class="row" style="margin-bottom: 12px;">
+        <h3 class="section-title">Nearby places</h3>
+        <span class="muted" id="nearbyCount">Updated live</span>
+      </div>
       <div id="nearbyList"></div>
     </div>
   </div>
 </section>
 
-<section id="saved" class="view"><h1>Saved places</h1><div class="sub">Places you want to remember.</div><div class="grid three">
-  <div class="card empty-hint"><h3>Loading…</h3><p class="muted">Fetching your saved places.</p></div>
-</div></section>
+<section id="saved" class="view">
+  <h1>Saved places</h1>
+  <div class="sub">Places you want to remember.</div>
+  <div class="grid three">
+    <div class="card empty-hint">
+      <h3>Loading…</h3>
+      <p class="muted">Fetching your saved places.</p>
+    </div>
+  </div>
+</section>
 
-<section id="contribute" class="view"><h1>Make the map smarter.</h1><div class="sub">Your firsthand experience helps someone else plan with confidence.</div>
-<div class="grid two"><div class="card"><h3>Submit an accessibility check</h3>
-<div class="field"><label>PLACE</label><input id="placeName" placeholder="e.g. Harbour Lights Café"></div>
-<div class="field"><label for="checkCategory">WHAT DID YOU CHECK?</label><select id="checkCategory"><option>Entrance & pathway</option><option>Restroom</option><option>Seating</option><option>Parking</option><option>Sensory environment</option></select></div>
-<div class="field"><label>YOUR RATING</label><div class="filters" id="ratingGroup"><button class="filter" data-value="1" onclick="selectRating(this)">1</button><button class="filter" data-value="2" onclick="selectRating(this)">2</button><button class="filter" data-value="3" onclick="selectRating(this)">3</button><button class="filter" data-value="4" onclick="selectRating(this)">4</button><button class="filter on" data-value="5" onclick="selectRating(this)">5</button></div></div>
-<div class="field"><label for="notesInput">NOTES</label><textarea id="notesInput" rows="4" placeholder="What should another visitor know?"></textarea></div>
-<button class="btn" onclick="submitReview()">Submit review</button></div>
-<div class="card"><h3>Contributor impact</h3><div class="grid three"><div class="stat"><b id="statReviews">42</b><span>Reviews</span></div><div class="stat"><b>18</b><span>Photos</span></div><div class="stat"><b>7</b><span>Updates</span></div></div><hr style="border:0;border-top:1px solid var(--line);margin:22px 0"><p><b>Community Contributor</b></p><div class="progress"><i style="width:72%"></i></div><p class="muted">8 more verified updates to reach Local Guide.</p><div class="tag">🏅 Reliable Reporter</div></div></div></section>
+<section id="contribute" class="view">
+  <h1>Make the map smarter</h1>
+  <div class="sub">Your firsthand experience helps someone else plan with confidence.</div>
+  <div class="grid two">
+    <div class="card">
+      <h3 style="margin-top:0">Submit an accessibility check</h3>
+      <div class="field"><label>PLACE</label><input id="placeName" placeholder="e.g. Harbour Lights Café"></div>
+      <div class="field">
+        <label for="checkCategory">WHAT DID YOU CHECK?</label>
+        <select id="checkCategory">
+          <option>Entrance & pathway</option>
+          <option>Restroom</option>
+          <option>Seating</option>
+          <option>Parking</option>
+          <option>Sensory environment</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>YOUR RATING</label>
+        <div class="filters" id="ratingGroup" style="margin-bottom:0">
+          <button class="filter" data-value="1" onclick="selectRating(this)">1</button>
+          <button class="filter" data-value="2" onclick="selectRating(this)">2</button>
+          <button class="filter" data-value="3" onclick="selectRating(this)">3</button>
+          <button class="filter" data-value="4" onclick="selectRating(this)">4</button>
+          <button class="filter on" data-value="5" onclick="selectRating(this)">5</button>
+        </div>
+      </div>
+      <div class="field"><label for="notesInput">NOTES</label><textarea id="notesInput" rows="4" placeholder="What should another visitor know?"></textarea></div>
+      <button class="btn" style="width:100%" onclick="submitReview()">Submit review</button>
+    </div>
 
-<section id="profile" class="view"><h1>Jordan Peters</h1><div class="sub">Your AccessNow profile and contribution history.</div>
-<div class="grid two"><div class="card"><div class="row"><div class="avatar" style="width:64px;height:64px;font-size:20px">JP</div><div style="flex:1"><h2 style="margin:0">Jordan Peters</h2><div class="muted">Community Contributor</div></div><button class="btn secondary">Edit profile</button></div><hr style="border:0;border-top:1px solid var(--line);margin:20px 0"><h3>Accessibility preferences</h3><div class="filters"><span class="filter on">♿ Wheelchair</span><span class="filter">No stairs</span><span class="filter">Accessible WC</span></div></div>
-<div class="card"><h3>Contribution activity</h3><div class="stat"><b id="profileReviews">42</b><span>Total reviews submitted</span></div><div style="margin-top:14px"><b>Latest activity</b><p class="muted">Updated Central Market entrance · 2 hours ago</p><p class="muted">Added photo to Harbour Lights Café · yesterday</p><p class="muted">Reviewed MovieHouse One · 5 days ago</p></div></div></div></section>
+    <div class="card">
+      <h3 style="margin-top:0">Contributor impact</h3>
+      <div class="grid three">
+        <div class="stat"><b id="statReviews">42</b><span>Reviews</span></div>
+        <div class="stat"><b>18</b><span>Photos</span></div>
+        <div class="stat"><b>7</b><span>Updates</span></div>
+      </div>
+      <hr style="border:0;border-top:1px solid var(--slate-200);margin:24px 0">
+      <div class="row"><div style="font-weight: 700;">Community Contributor</div><div class="tag">🏅 Reliable Reporter</div></div>
+      <div class="progress" style="margin: 12px 0;"><i style="width:72%"></i></div>
+      <p class="muted" style="margin:0">8 more verified updates to reach Local Guide.</p>
+    </div>
+  </div>
+</section>
 
-<section id="settings" class="view"><h1>Preferences</h1><div class="sub">Personalize how AccessNow finds and routes places for you.</div><div class="card" style="max-width:760px"><h3>Navigation preferences</h3><div class="place"><div style="flex:1"><b>Avoid stairs</b><div class="muted">Always route around stairs when possible.</div></div><button class="filter on" onclick="this.classList.toggle('on')">On</button></div><div class="place"><div style="flex:1"><b>Avoid steep grades</b><div class="muted">Prefer flatter routes even when they take longer.</div></div><button class="filter on" onclick="this.classList.toggle('on')">On</button></div><div class="place"><div style="flex:1"><b>Venue-change alerts</b><div class="muted">Notify me when accessibility information changes.</div></div><button class="filter" onclick="this.classList.toggle('on')">Off</button></div><h3 style="margin-top:25px">Default filters</h3><div class="filters"><button class="filter on">♿ Wheelchair</button><button class="filter">Visual</button><button class="filter">Hearing</button><button class="filter">Sensory</button></div></div></section>
-</div></main></div>
+<section id="profile" class="view">
+  <h1>Jordan Peters</h1>
+  <div class="sub">Your AccessNow profile and contribution history.</div>
+  <div class="grid two">
+    <div class="card">
+      <div class="row">
+        <div class="avatar" style="width:56px;height:56px;font-size:18px">JP</div>
+        <div style="flex:1">
+          <h2 style="margin:0; font-size:20px">Jordan Peters</h2>
+          <div class="muted">Community Contributor</div>
+        </div>
+        <button class="btn secondary">Edit profile</button>
+      </div>
+      <hr style="border:0;border-top:1px solid var(--slate-200);margin:20px 0">
+      <h3 style="font-size:15px">Accessibility preferences</h3>
+      <div class="filters" style="margin:0"><span class="filter on">♿ Wheelchair</span><span class="filter">No stairs</span><span class="filter">Accessible WC</span></div>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0; font-size:15px">Contribution activity</h3>
+      <div class="stat"><b id="profileReviews">42</b><span>Total reviews submitted</span></div>
+      <div style="margin-top:16px">
+        <div style="font-weight: 700; margin-bottom:6px">Latest activity</div>
+        <p class="muted" style="margin:4px 0">Updated Central Market entrance · 2 hours ago</p>
+        <p class="muted" style="margin:4px 0">Added photo to Harbour Lights Café · yesterday</p>
+        <p class="muted" style="margin:4px 0">Reviewed MovieHouse One · 5 days ago</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-<div class="modal" id="venueModal"><div class="modal-box"><button class="close" onclick="closeModal()">×</button><div id="venueContent"></div></div></div>
+<section id="settings" class="view">
+  <h1>Preferences</h1>
+  <div class="sub">Personalize how AccessNow finds and routes places for you.</div>
+  <div class="card" style="max-width:760px">
+    <h3 style="margin-top:0">Navigation preferences</h3>
+    <div class="place">
+      <div style="flex:1">
+        <div style="font-weight: 700;">Avoid stairs</div>
+        <div class="muted">Always route around stairs when possible.</div>
+      </div>
+      <button class="filter on" onclick="this.classList.toggle('on')">On</button>
+    </div>
+    <div class="place">
+      <div style="flex:1">
+        <div style="font-weight: 700;">Avoid steep grades</div>
+        <div class="muted">Prefer flatter routes even when they take longer.</div>
+      </div>
+      <button class="filter on" onclick="this.classList.toggle('on')">On</button>
+    </div>
+    <div class="place">
+      <div style="flex:1">
+        <div style="font-weight: 700;">Venue-change alerts</div>
+        <div class="muted">Notify me when accessibility information changes.</div>
+      </div>
+      <button class="filter" onclick="this.classList.toggle('on')">Off</button>
+    </div>
+    <h3 style="margin-top:28px">Default filters</h3>
+    <div class="filters" style="margin:0">
+      <button class="filter on">♿ Wheelchair</button>
+      <button class="filter">Visual</button>
+      <button class="filter">Hearing</button>
+      <button class="filter">Sensory</button>
+    </div>
+  </div>
+</section>
+
+</div>
+</main>
+</div>
+
+<div class="modal" id="venueModal">
+  <div class="modal-box">
+    <button class="close" onclick="closeModal()">×</button>
+    <div id="venueContent"></div>
+  </div>
+</div>
+
 <script>
 const API_BASE = "/api";
 let apiVenues = [];
@@ -153,10 +731,10 @@ function renderNearby(venues) {
       <div class="place" onclick="openVenueById(${v.id})">
         <div class="thumb">${v.icon || "📍"}</div>
         <div style="flex:1">
-          <div class="row"><b>${escapeHtml(v.name)}</b><span class="rating">${v.score}</span></div>
+          <div class="row"><span style="font-weight:700">${escapeHtml(v.name)}</span><span class="rating">${v.score}</span></div>
           <div class="stars">${"★".repeat(Math.round(v.score/20))}${"☆".repeat(5-Math.round(v.score/20))}</div>
           <div class="muted">${escapeHtml(v.address)} · ${v.review_count} reviews</div>
-          <div>${(v.tags || []).slice(0,2).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join(" ")}</div>
+          <div style="margin-top:6px">${(v.tags || []).slice(0,2).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join(" ")}</div>
         </div>
       </div>`).join("");
   updateMapCard(venues);
@@ -167,12 +745,9 @@ function updateMapCard(venues) {
   const slot = document.getElementById("mapCard");
   if (!slot || !venues.length) return;
   const top = venues.reduce((a,b) => b.score > a.score ? b : a, venues[0]);
-  slot.innerHTML = `<div class="row"><div><b>${escapeHtml(top.name)}</b><div class="muted">${escapeHtml(top.address)}</div></div><div class="score">${top.score}</div></div><div style="margin:12px 0">${(top.tags||[]).slice(0,3).map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join(" ")}</div><button class="btn" style="width:100%" onclick="openVenueById(${top.id})">View accessibility details</button>`;
+  slot.innerHTML = `<div class="row"><div><div style="font-weight:700">${escapeHtml(top.name)}</div><div class="muted">${escapeHtml(top.address)}</div></div><div class="score">${top.score}</div></div><div style="margin:12px 0">${(top.tags||[]).slice(0,3).map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join(" ")}</div><button class="btn" style="width:100%" onclick="openVenueById(${top.id})">View accessibility details</button>`;
 }
 
-// Contributor-impact numbers are derived client-side from the venues
-// already fetched, rather than a dedicated endpoint — keeps the API
-// surface small while still feeling "live" as reviews come in.
 function updateStats(venues) {
   const total = venues.reduce((sum,v) => sum + (v.review_count||0), 0);
   const reviewEls = [document.getElementById("statReviews"), document.getElementById("profileReviews")];
@@ -203,21 +778,21 @@ async function openVenueById(id) {
     selectedVenue = v;
     document.getElementById("venueContent").innerHTML = `
       <div class="row"><div><div class="muted">${escapeHtml(v.type)}</div>
-      <h1 style="margin:3px 0">${escapeHtml(v.name)}</h1>
+      <h1 style="margin:4px 0 2px">${escapeHtml(v.name)}</h1>
       <div class="muted">${escapeHtml(v.address)}</div></div>
-      <div class="score" style="width:72px;height:72px;font-size:21px">${v.score}</div></div>
-      <div style="margin:20px 0"><span class="verified">✓ Verified ${escapeHtml(v.verified)}</span> · <span class="muted">${v.review_count} community reviews</span></div>
+      <div class="score" style="width:64px;height:64px;font-size:20px">${v.score}</div></div>
+      <div style="margin:16px 0"><span class="verified">✓ Verified ${escapeHtml(v.verified)}</span> · <span class="muted">${v.review_count} community reviews</span></div>
       <div class="filters">${(v.tags || []).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join(" ")}</div>
       <h3>Accessibility breakdown</h3>
       ${(v.accessibility || []).map(x => `
-        <div style="margin:16px 0"><div class="row"><b>${escapeHtml(x.category)}</b>
-        <span class="muted">${escapeHtml(x.description)}</span><b>${x.percent}%</b></div>
-        <div class="progress"><i style="width:${x.percent}%"></i></div></div>`).join("")}
-      ${v.latest_review ? `<div class="card" style="background:#F8FAFC;box-shadow:none;margin-top:20px">
-        <div class="stars">${"★".repeat(v.latest_review.rating)}${"☆".repeat(5-v.latest_review.rating)}</div><p style="margin:8px 0">“${escapeHtml(v.latest_review.body)}”</p>
-        <b>${escapeHtml(v.latest_review.author)}</b><div class="muted">Community contributor</div></div>` : ""}
-      <div style="display:flex;gap:10px;margin-top:18px">
-        <button class="btn" onclick="showRoute(${v.id})">Get accessible route</button>
+        <div style="margin:16px 0"><div class="row"><span style="font-weight:700">${escapeHtml(x.category)}</span>
+        <span class="muted">${escapeHtml(x.description)}</span><span style="font-weight:700">${x.percent}%</span></div>
+        <div class="progress" style="margin-top:6px"><i style="width:${x.percent}%"></i></div></div>`).join("")}
+      ${v.latest_review ? `<div class="card" style="background:var(--slate-50);box-shadow:none;margin-top:20px;border-color:var(--slate-200)">
+        <div class="stars">${"★".repeat(v.latest_review.rating)}${"☆".repeat(5-v.latest_review.rating)}</div><p style="margin:8px 0; font-style:italic">“${escapeHtml(v.latest_review.body)}”</p>
+        <div style="font-weight:700">${escapeHtml(v.latest_review.author)}</div><div class="muted">Community contributor</div></div>` : ""}
+      <div style="display:flex;gap:10px;margin-top:24px">
+        <button class="btn" style="flex:1" onclick="showRoute(${v.id})">Get accessible route</button>
         <button class="btn secondary" onclick="alert('Photo upload opened for this venue.')">Add photo</button>
         <button class="btn ghost" onclick="saveVenue(${v.id})">♡ Save</button>
       </div>`;
@@ -242,15 +817,15 @@ async function showRoute(id) {
     closeModal();
     document.getElementById("venueModal").classList.add("open");
     document.getElementById("venueContent").innerHTML = `
-      <div class="muted">ACCESSIBLE NAVIGATION</div>
-      <h1>Route to ${escapeHtml(route.venue_name)}</h1>
+      <div class="muted" style="font-size:11px; font-weight:700; letter-spacing:0.5px">ACCESSIBLE NAVIGATION</div>
+      <h1 style="margin-top:4px">Route to ${escapeHtml(route.venue_name)}</h1>
       <div class="sub">Routes are tailored to your wheelchair + no-stairs preferences.</div>
-      <div class="route active"><div class="score">A</div><div style="flex:1"><b>Accessible route</b>
-      <div class="muted">${route.minutes} min · ${route.miles} mi · no stairs · smooth paths</div></div><b>Recommended</b></div>
-      <div class="route"><div class="score" style="background:#FFF5DD;color:#A86C00">B</div><div style="flex:1"><b>Alternative</b>
+      <div class="route active"><div class="score">A</div><div style="flex:1"><div style="font-weight:700">Accessible route</div>
+      <div class="muted">${route.minutes} min · ${route.miles} mi · no stairs · smooth paths</div></div><span style="font-weight:700; color:var(--blue-600)">Recommended</span></div>
+      <div class="route"><div class="score" style="background:var(--amber-50);color:var(--amber-600);border-color:rgba(217,119,6,0.15)">B</div><div style="flex:1"><div style="font-weight:700">Alternative</div>
       <div class="muted">${route.alternative_minutes} min · ${route.alternative_miles} mi · one steep section</div></div></div>
-      <div class="card" style="margin-top:18px"><b>Route alerts</b><p class="muted">${escapeHtml(route.alert)}</p></div>
-      <button class="btn" onclick="closeModal()">Start navigation</button>`;
+      <div class="card" style="margin-top:18px; background:var(--slate-50)"><b>Route alerts</b><p class="muted" style="margin:4px 0 0">${escapeHtml(route.alert)}</p></div>
+      <button class="btn" style="width:100%; margin-top:16px" onclick="closeModal()">Start navigation</button>`;
   } catch (error) {
     alert(error.message);
   }
@@ -317,10 +892,10 @@ async function loadSaved() {
     const saved = await api("/users/1/saved");
     const section = document.getElementById("saved");
     section.querySelector(".grid").innerHTML = saved.map(s => `
-      <div class="card"><div class="thumb" style="width:100%;height:150px">${s.venue.icon || "📍"}</div>
-      <h3>${escapeHtml(s.venue.name)}</h3><div class="verified">✓ Verified ${escapeHtml(s.venue.verified)}</div>
-      <p class="muted">${s.venue.score} accessibility score · ${escapeHtml(s.venue.address)}</p>
-      <div style="display:flex;gap:8px;margin-top:10px">
+      <div class="card"><div class="thumb" style="width:100%;height:140px;border-radius:var(--radius-md);margin-bottom:12px">${s.venue.icon || "📍"}</div>
+      <h3 style="margin:0 0 4px">${escapeHtml(s.venue.name)}</h3><div class="verified">✓ Verified ${escapeHtml(s.venue.verified)}</div>
+      <p class="muted" style="margin:6px 0 14px">${s.venue.score} accessibility score · ${escapeHtml(s.venue.address)}</p>
+      <div style="display:flex;gap:8px">
         <button class="btn" style="flex:1" onclick="openVenueById(${s.venue.id})">View place</button>
         <button class="btn ghost" onclick="unsaveVenue(${s.id})">Remove</button>
       </div></div>`).join("") ||
@@ -349,4 +924,5 @@ function escapeHtml(value){return String(value ?? "").replace(/[&<>"']/g,c=>({"&
 document.getElementById("venueModal").addEventListener("click",e=>{if(e.target.id==="venueModal")closeModal();});
 document.addEventListener("DOMContentLoaded", loadHome);
 </script>
-</body></html>
+</body>
+</html>
