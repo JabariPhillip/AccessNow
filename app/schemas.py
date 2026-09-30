@@ -50,6 +50,10 @@ class SavedCreate(BaseModel):
     user_id: int
     venue_id: int
 
+class SavedOut(BaseModel):
+    id: int
+    venue: VenueListOut
+
 class RouteOut(BaseModel):
     venue_name: str
     minutes: int
