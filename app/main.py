@@ -1,5 +1,6 @@
 from pathlib import Path
 from fastapi import Depends, FastAPI, HTTPException, Query
+from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from sqlalchemy import func, select
@@ -8,6 +9,21 @@ from sqlalchemy.orm import Session
 from .db import Base, engine, get_db
 from .models import AccessibilityCheck, Review, SavedPlace, User, Venue
 from .schemas import AccessibilityOut, ReviewCreate, RouteOut, SavedCreate, SavedOut, UserOut, VenueOut, VenueListOut
+
+from .seed import seed_database
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    seed_database()
+    yield
+
+
+app = FastAPI(
+    title="AccessNow API",
+    version="1.0.0",
+    lifespan=lifespan,
+)
 
 Base.metadata.create_all(bind=engine)
 
