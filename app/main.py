@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from .db import Base, engine, get_db
 from .models import AccessibilityCheck, Review, SavedPlace, User, Venue
-from .schemas import ReviewCreate, RouteOut, SavedCreate, UserOut, VenueOut, VenueListOut
+from .schemas import AccessibilityOut, ReviewCreate, RouteOut, SavedCreate, SavedOut, UserOut, VenueOut, VenueListOut
 
 Base.metadata.create_all(bind=engine)
 
@@ -22,6 +22,17 @@ app.add_middleware(
 )
 
 FRONTEND = Path(__file__).resolve().parent.parent / "frontend" / "index.html"
+
+# The contribute form offers slightly friendlier labels than the
+# AccessibilityCheck categories seeded in the database; map one to the other
+# so a submitted review actually nudges the right breakdown row.
+CATEGORY_ALIASES = {
+    "entrance & pathway": "Entrance",
+    "restroom": "Restroom",
+    "seating": "Seating",
+    "parking": "Parking",
+    "sensory environment": "Sensory",
+}
 
 def venue_score(db: Session, venue: Venue) -> int:
     checks = db.scalars(select(AccessibilityCheck).where(AccessibilityCheck.venue_id == venue.id)).all()
@@ -69,7 +80,7 @@ def get_venue(venue_id: int, db: Session = Depends(get_db)):
         }
     return VenueOut(
         **base.model_dump(),
-        accessibility=[AccessibilityCheck.model_validate(x, from_attributes=True) for x in venue.accessibility],
+        accessibility=[AccessibilityOut.model_validate(x, from_attributes=True) for x in venue.accessibility],
         latest_review=latest_out
     )
 
@@ -94,9 +105,32 @@ def create_review(venue_id: int, payload: ReviewCreate, db: Session = Depends(ge
                     category=payload.category, body=payload.body)
     db.add(review)
     user.review_count += 1
+
+    # Blend the new rating into the matching accessibility-breakdown row so
+    # the venue's score actually moves in response to community input,
+    # rather than only the review count changing.
+    canonical = CATEGORY_ALIASES.get(payload.category.strip().lower(), payload.category.strip() or "Entrance")
+    new_percent = max(0, min(100, payload.rating * 20))
+    check = db.scalar(
+        select(AccessibilityCheck).where(
+            AccessibilityCheck.venue_id == venue_id,
+            func.lower(AccessibilityCheck.category) == canonical.lower(),
+        )
+    )
+    if check:
+        check.percent = round((check.percent + new_percent) / 2)
+        if payload.body:
+            check.description = payload.body[:200]
+    else:
+        db.add(AccessibilityCheck(
+            venue_id=venue_id, category=canonical,
+            description=payload.body[:200] if payload.body else "Community reported",
+            percent=new_percent,
+        ))
+
     db.commit()
     db.refresh(review)
-    return {"id": review.id, "status": "queued_for_moderation"}
+    return {"id": review.id, "status": "queued_for_moderation", "score": venue_score(db, venue)}
 
 @app.get("/api/users/{user_id}", response_model=UserOut)
 def get_user(user_id: int, db: Session = Depends(get_db)):
@@ -105,10 +139,10 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(404, "User not found")
     return user
 
-@app.get("/api/users/{user_id}/saved", response_model=list[VenueListOut])
+@app.get("/api/users/{user_id}/saved", response_model=list[SavedOut])
 def get_saved(user_id: int, db: Session = Depends(get_db)):
     saved = db.scalars(select(SavedPlace).where(SavedPlace.user_id == user_id).order_by(SavedPlace.created_at.desc())).all()
-    return [venue_list(db, s.venue) for s in saved]
+    return [SavedOut(id=s.id, venue=venue_list(db, s.venue)) for s in saved]
 
 @app.post("/api/saved", status_code=201)
 def save_place(payload: SavedCreate, db: Session = Depends(get_db)):
