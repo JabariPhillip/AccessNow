@@ -64,7 +64,7 @@ linear-gradient(70deg,transparent 62%,#e1e6ee 63%,#e1e6ee 64%,transparent 65%),
     <button onclick="showView('profile',this)">◯ &nbsp; My profile</button>
     <button onclick="showView('settings',this)">⚙ &nbsp; Preferences</button>
   </div>
-  <div class="user"><div class="avatar">JP</div><div><b>Jordan Peters</b><div class="muted">Contributor · 42 reviews</div></div></div>
+  <div class="user"><div class="avatar">JP</div><div><b>Jordan Peters</b><div class="muted" id="sidebarMeta">Contributor · 42 reviews</div></div></div>
 </aside>
 <main class="main">
 <header class="top">
@@ -82,34 +82,31 @@ linear-gradient(70deg,transparent 62%,#e1e6ee 63%,#e1e6ee 64%,transparent 65%),
     <div class="map">
       <div class="map-tools"><button class="pill" onclick="alert('Map centered on your selected area.')">◎ Near me</button><button class="pill" onclick="alert('Showing accessibility-friendly routes.')">⇢ Accessible routes</button></div>
       <div class="map-label" style="left:18%;top:22%">Independence Square</div><div class="map-label" style="left:63%;top:15%">Woodbrook</div><div class="map-label" style="left:42%;top:68%">Downtown</div>
-      <div class="map-card"><div class="row"><div><b>AccessNow map</b><div class="muted">Select a venue pin to inspect accessibility.</div></div><div class="score">AI</div></div></div></div><div class="card">
-      <div class="row"><h3 class="section-title">Nearby places</h3><span class="muted">Updated live</span></div>
-      <div class="place" onclick="openVenue('Harbour Lights Café')"><div class="thumb">☕</div><div style="flex:1"><div class="row"><b>Harbour Lights Café</b><span class="rating">94</span></div><div class="stars">★★★★★</div><div class="muted">0.4 mi · 23 reviews</div><div><span class="tag">Step-free</span> <span class="tag">WC</span></div></div></div>
-      <div class="place" onclick="openVenue('The Green Room')"><div class="thumb">🍽️</div><div style="flex:1"><div class="row"><b>The Green Room</b><span class="rating">88</span></div><div class="stars">★★★★☆</div><div class="muted">0.7 mi · 17 reviews</div><div><span class="tag">Ramp</span> <span class="tag">Wide doors</span></div></div></div>
-      <div class="place" onclick="openVenue('Queen’s Park Medical')"><div class="thumb">🏥</div><div style="flex:1"><div class="row"><b>Queen’s Park Medical</b><span class="rating">97</span></div><div class="stars">★★★★★</div><div class="muted">1.1 mi · 31 reviews</div><div><span class="tag">Lift</span> <span class="tag">WC</span></div></div></div>
-      <div class="place" onclick="openVenue('Central Market')"><div class="thumb">🛍️</div><div style="flex:1"><div class="row"><b>Central Market</b><span class="rating">62</span></div><div class="stars">★★★☆☆</div><div class="muted">1.3 mi · 9 reviews</div><div><span class="tag" style="background:#FFF5DD;color:#9A6500">Step at entrance</span></div></div></div>
+      <div class="map-card" id="mapCard"><div class="row"><div><b>AccessNow map</b><div class="muted">Select a venue pin to inspect accessibility.</div></div></div></div>
+    </div>
+    <div class="card">
+      <div class="row"><h3 class="section-title">Nearby places</h3><span class="muted" id="nearbyCount">Updated live</span></div>
+      <div id="nearbyList"></div>
     </div>
   </div>
 </section>
 
 <section id="saved" class="view"><h1>Saved places</h1><div class="sub">Places you want to remember.</div><div class="grid three">
-  <div class="card"><div class="thumb" style="width:100%;height:150px">☕</div><h3>Harbour Lights Café</h3><div class="verified">✓ Verified 2 days ago</div><p class="muted">94 accessibility score · Step-free entrance</p><button class="btn" onclick="openVenue('Harbour Lights Café')">View place</button></div>
-  <div class="card"><div class="thumb" style="width:100%;height:150px">🎬</div><h3>MovieHouse One</h3><div class="verified">✓ Verified 1 week ago</div><p class="muted">91 accessibility score · Accessible seating</p><button class="btn" onclick="openVenue('MovieHouse One')">View place</button></div>
-  <div class="card"><div class="thumb" style="width:100%;height:150px">🌳</div><h3>Queen's Park Savannah</h3><div class="verified">✓ Verified today</div><p class="muted">86 accessibility score · Accessible paths</p><button class="btn" onclick="openVenue('Queen’s Park Medical')">View nearby</button></div>
+  <div class="card empty-hint"><h3>Loading…</h3><p class="muted">Fetching your saved places.</p></div>
 </div></section>
 
 <section id="contribute" class="view"><h1>Make the map smarter.</h1><div class="sub">Your firsthand experience helps someone else plan with confidence.</div>
 <div class="grid two"><div class="card"><h3>Submit an accessibility check</h3>
 <div class="field"><label>PLACE</label><input id="placeName" placeholder="e.g. Harbour Lights Café"></div>
-<div class="field"><label>WHAT DID YOU CHECK?</label><select><option>Entrance & pathway</option><option>Restroom</option><option>Seating</option><option>Parking</option><option>Sensory environment</option></select></div>
-<div class="field"><label>YOUR RATING</label><div class="filters"><button class="filter on">1</button><button class="filter">2</button><button class="filter">3</button><button class="filter">4</button><button class="filter">5</button></div></div>
-<div class="field"><label>NOTES</label><textarea rows="4" placeholder="What should another visitor know?"></textarea></div>
+<div class="field"><label for="checkCategory">WHAT DID YOU CHECK?</label><select id="checkCategory"><option>Entrance & pathway</option><option>Restroom</option><option>Seating</option><option>Parking</option><option>Sensory environment</option></select></div>
+<div class="field"><label>YOUR RATING</label><div class="filters" id="ratingGroup"><button class="filter" data-value="1" onclick="selectRating(this)">1</button><button class="filter" data-value="2" onclick="selectRating(this)">2</button><button class="filter" data-value="3" onclick="selectRating(this)">3</button><button class="filter" data-value="4" onclick="selectRating(this)">4</button><button class="filter on" data-value="5" onclick="selectRating(this)">5</button></div></div>
+<div class="field"><label for="notesInput">NOTES</label><textarea id="notesInput" rows="4" placeholder="What should another visitor know?"></textarea></div>
 <button class="btn" onclick="submitReview()">Submit review</button></div>
-<div class="card"><h3>Contributor impact</h3><div class="grid three"><div class="stat"><b>42</b><span>Reviews</span></div><div class="stat"><b>18</b><span>Photos</span></div><div class="stat"><b>7</b><span>Updates</span></div></div><hr style="border:0;border-top:1px solid var(--line);margin:22px 0"><p><b>Community Contributor</b></p><div class="progress"><i style="width:72%"></i></div><p class="muted">8 more verified updates to reach Local Guide.</p><div class="tag">🏅 Reliable Reporter</div></div></div></section>
+<div class="card"><h3>Contributor impact</h3><div class="grid three"><div class="stat"><b id="statReviews">42</b><span>Reviews</span></div><div class="stat"><b>18</b><span>Photos</span></div><div class="stat"><b>7</b><span>Updates</span></div></div><hr style="border:0;border-top:1px solid var(--line);margin:22px 0"><p><b>Community Contributor</b></p><div class="progress"><i style="width:72%"></i></div><p class="muted">8 more verified updates to reach Local Guide.</p><div class="tag">🏅 Reliable Reporter</div></div></div></section>
 
 <section id="profile" class="view"><h1>Jordan Peters</h1><div class="sub">Your AccessNow profile and contribution history.</div>
 <div class="grid two"><div class="card"><div class="row"><div class="avatar" style="width:64px;height:64px;font-size:20px">JP</div><div style="flex:1"><h2 style="margin:0">Jordan Peters</h2><div class="muted">Community Contributor</div></div><button class="btn secondary">Edit profile</button></div><hr style="border:0;border-top:1px solid var(--line);margin:20px 0"><h3>Accessibility preferences</h3><div class="filters"><span class="filter on">♿ Wheelchair</span><span class="filter">No stairs</span><span class="filter">Accessible WC</span></div></div>
-<div class="card"><h3>Contribution activity</h3><div class="stat"><b>42</b><span>Total reviews submitted</span></div><div style="margin-top:14px"><b>Latest activity</b><p class="muted">Updated Central Market entrance · 2 hours ago</p><p class="muted">Added photo to Harbour Lights Café · yesterday</p><p class="muted">Reviewed MovieHouse One · 5 days ago</p></div></div></div></section>
+<div class="card"><h3>Contribution activity</h3><div class="stat"><b id="profileReviews">42</b><span>Total reviews submitted</span></div><div style="margin-top:14px"><b>Latest activity</b><p class="muted">Updated Central Market entrance · 2 hours ago</p><p class="muted">Added photo to Harbour Lights Café · yesterday</p><p class="muted">Reviewed MovieHouse One · 5 days ago</p></div></div></div></section>
 
 <section id="settings" class="view"><h1>Preferences</h1><div class="sub">Personalize how AccessNow finds and routes places for you.</div><div class="card" style="max-width:760px"><h3>Navigation preferences</h3><div class="place"><div style="flex:1"><b>Avoid stairs</b><div class="muted">Always route around stairs when possible.</div></div><button class="filter on" onclick="this.classList.toggle('on')">On</button></div><div class="place"><div style="flex:1"><b>Avoid steep grades</b><div class="muted">Prefer flatter routes even when they take longer.</div></div><button class="filter on" onclick="this.classList.toggle('on')">On</button></div><div class="place"><div style="flex:1"><b>Venue-change alerts</b><div class="muted">Notify me when accessibility information changes.</div></div><button class="filter" onclick="this.classList.toggle('on')">Off</button></div><h3 style="margin-top:25px">Default filters</h3><div class="filters"><button class="filter on">♿ Wheelchair</button><button class="filter">Visual</button><button class="filter">Hearing</button><button class="filter">Sensory</button></div></div></section>
 </div></main></div>
@@ -144,12 +141,15 @@ async function loadHome() {
 }
 
 function renderNearby(venues) {
-  const cards = document.querySelectorAll("#home .card");
-  const panel = cards[1];
+  const panel = document.getElementById("nearbyList");
   if (!panel) return;
-  panel.innerHTML = `
-    <div class="row"><h3 class="section-title">Nearby places</h3><span class="muted">${venues.length} demo venues</span></div>
-    ${venues.map(v => `
+  const count = document.getElementById("nearbyCount");
+  if (count) count.textContent = `${venues.length} demo venues`;
+  if (!venues.length) {
+    panel.innerHTML = `<div class="muted" style="padding:20px 0">No places match yet.</div>`;
+    return;
+  }
+  panel.innerHTML = venues.map(v => `
       <div class="place" onclick="openVenueById(${v.id})">
         <div class="thumb">${v.icon || "📍"}</div>
         <div style="flex:1">
@@ -158,7 +158,27 @@ function renderNearby(venues) {
           <div class="muted">${escapeHtml(v.address)} · ${v.review_count} reviews</div>
           <div>${(v.tags || []).slice(0,2).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join(" ")}</div>
         </div>
-      </div>`).join("")}`;
+      </div>`).join("");
+  updateMapCard(venues);
+  updateStats(venues);
+}
+
+function updateMapCard(venues) {
+  const slot = document.getElementById("mapCard");
+  if (!slot || !venues.length) return;
+  const top = venues.reduce((a,b) => b.score > a.score ? b : a, venues[0]);
+  slot.innerHTML = `<div class="row"><div><b>${escapeHtml(top.name)}</b><div class="muted">${escapeHtml(top.address)}</div></div><div class="score">${top.score}</div></div><div style="margin:12px 0">${(top.tags||[]).slice(0,3).map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join(" ")}</div><button class="btn" style="width:100%" onclick="openVenueById(${top.id})">View accessibility details</button>`;
+}
+
+// Contributor-impact numbers are derived client-side from the venues
+// already fetched, rather than a dedicated endpoint — keeps the API
+// surface small while still feeling "live" as reviews come in.
+function updateStats(venues) {
+  const total = venues.reduce((sum,v) => sum + (v.review_count||0), 0);
+  const reviewEls = [document.getElementById("statReviews"), document.getElementById("profileReviews")];
+  reviewEls.forEach(el => { if (el) el.textContent = total; });
+  const meta = document.getElementById("sidebarMeta");
+  if (meta) meta.textContent = `Contributor · ${total} reviews`;
 }
 
 function renderMapPins(venues) {
@@ -194,7 +214,7 @@ async function openVenueById(id) {
         <span class="muted">${escapeHtml(x.description)}</span><b>${x.percent}%</b></div>
         <div class="progress"><i style="width:${x.percent}%"></i></div></div>`).join("")}
       ${v.latest_review ? `<div class="card" style="background:#F8FAFC;box-shadow:none;margin-top:20px">
-        <div class="stars">★★★★★</div><p style="margin:8px 0">“${escapeHtml(v.latest_review.body)}”</p>
+        <div class="stars">${"★".repeat(v.latest_review.rating)}${"☆".repeat(5-v.latest_review.rating)}</div><p style="margin:8px 0">“${escapeHtml(v.latest_review.body)}”</p>
         <b>${escapeHtml(v.latest_review.author)}</b><div class="muted">Community contributor</div></div>` : ""}
       <div style="display:flex;gap:10px;margin-top:18px">
         <button class="btn" onclick="showRoute(${v.id})">Get accessible route</button>
@@ -246,6 +266,10 @@ function showView(id,btn) {
 }
 
 function toggleFilter(b){b.classList.toggle("on");}
+function selectRating(b){
+  document.querySelectorAll("#ratingGroup .filter").forEach(x=>x.classList.remove("on"));
+  b.classList.add("on");
+}
 
 async function doSearch() {
   const q = document.getElementById("searchInput").value.trim();
@@ -268,16 +292,21 @@ async function submitReview() {
   if (!name) return alert("Enter a place name first.");
   const venue = apiVenues.find(v => v.name.toLowerCase().includes(name.toLowerCase()));
   if (!venue) return alert("For this demo, submit a review for one of the existing venues.");
+  const category = document.getElementById("checkCategory").value;
+  const ratingBtn = document.querySelector("#ratingGroup .filter.on");
+  const rating = ratingBtn ? parseInt(ratingBtn.dataset.value, 10) : 5;
+  const notes = document.getElementById("notesInput").value.trim();
   try {
-    await api(`/venues/${venue.id}/reviews`, {
+    const result = await api(`/venues/${venue.id}/reviews`, {
       method:"POST",
       body:JSON.stringify({
-        user_id:1, rating:5,
-        category:"Entrance & pathway",
-        body:"Demo community update submitted from the AccessNow prototype."
+        user_id:1, rating, category,
+        body: notes || "Demo community update submitted from the AccessNow prototype."
       })
     });
-    alert("Thanks! Your review was saved to the database and added to the moderation queue.");
+    alert(`Thanks! "${venue.name}" is now at ${result.score}% accessibility after your ${rating}-star review.`);
+    document.getElementById("placeName").value = "";
+    document.getElementById("notesInput").value = "";
     await loadHome();
     showView("home", document.querySelector(".nav button"));
   } catch (error) { alert(error.message); }
@@ -287,13 +316,23 @@ async function loadSaved() {
   try {
     const saved = await api("/users/1/saved");
     const section = document.getElementById("saved");
-    section.querySelector(".grid").innerHTML = saved.map(v => `
-      <div class="card"><div class="thumb" style="width:100%;height:150px">${v.icon || "📍"}</div>
-      <h3>${escapeHtml(v.name)}</h3><div class="verified">✓ Verified ${escapeHtml(v.verified)}</div>
-      <p class="muted">${v.score} accessibility score · ${escapeHtml(v.address)}</p>
-      <button class="btn" onclick="openVenueById(${v.id})">View place</button></div>`).join("") ||
+    section.querySelector(".grid").innerHTML = saved.map(s => `
+      <div class="card"><div class="thumb" style="width:100%;height:150px">${s.venue.icon || "📍"}</div>
+      <h3>${escapeHtml(s.venue.name)}</h3><div class="verified">✓ Verified ${escapeHtml(s.venue.verified)}</div>
+      <p class="muted">${s.venue.score} accessibility score · ${escapeHtml(s.venue.address)}</p>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="btn" style="flex:1" onclick="openVenueById(${s.venue.id})">View place</button>
+        <button class="btn ghost" onclick="unsaveVenue(${s.id})">Remove</button>
+      </div></div>`).join("") ||
       `<div class="card"><h3>No saved places yet</h3><p class="muted">Save a venue from its accessibility details.</p></div>`;
   } catch (error) { console.error(error); }
+}
+
+async function unsaveVenue(savedId) {
+  try {
+    await api(`/saved/${savedId}`, {method:"DELETE"});
+    await loadSaved();
+  } catch (error) { alert(error.message); }
 }
 
 async function loadProfile() {
