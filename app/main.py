@@ -25,10 +25,6 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-Base.metadata.create_all(bind=engine)
-
-app = FastAPI(title="AccessNow API", version="1.0.0")
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
